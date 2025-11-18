@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="android:statusBarColor">@color/primary</item>
+    </style>
+
+    <!-- Chip styles for reuse -->
+    <style name="ChipBase">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ChipStyleActive" parent="ChipBase">
+        <item name="android:background">@drawable/chip_active</item>
+        <item name="android:textColor">@color/primary</item>
+    </style>
+
+    <style name="ChipStyleInactive" parent="ChipBase">
+        <item name="android:background">@drawable/chip_inactive</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+</resources>

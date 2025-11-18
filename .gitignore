@@ -1,0 +1,53 @@
+# === Android Studio ===
+.idea/
+.gradle/
+local.properties
+*.iml
+
+# === Build ===
+/build/
+/app/build/
+/**/build/
+
+# === Gradle Wrapper Jars ===
+gradle-app.setting
+!gradle/wrapper/gradle-wrapper.jar
+
+# === Logs ===
+*.log
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+
+# === Android Specific ===
+/captures/
+/outputs/
+.navigation/
+.cxx/
+
+# === NDK ===
+/obj/
+
+# === Keystore files ===
+*.jks
+*.keystore
+
+# === Kotlin ===
+*.kotlin_module
+
+# === Generated files ===
+*.apk
+*.ap_
+*.dex
+*.class
+
+# === IntelliJ ===
+/out/
+*.ipr
+*.iws
+
+# === Crashlytics / Firebase ===
+crashlytics-build.properties
+fabric.properties
+
