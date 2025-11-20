@@ -13,7 +13,7 @@ import net.irivas.cobrosapp.R
 import net.irivas.cobrosapp.adapters.ComercianteAdapter
 import net.irivas.cobrosapp.data.CobrosDBHelper
 
-class ListaComerciantesActivity : AppCompatActivity() {
+class ListarComerciantesActivity : AppCompatActivity() {
 
     private lateinit var db: CobrosDBHelper
     private lateinit var recycler: RecyclerView
@@ -36,7 +36,7 @@ class ListaComerciantesActivity : AppCompatActivity() {
     }
 
     private fun cargarLista() {
-        val lista = db.obtenerComerciantes()  // Asegúrate de tener este método.
+        val lista = db.obtenerComerciantes()
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = ComercianteAdapter(lista) { comerciante ->
             val intent = Intent(this, GestionarPuestoActivity::class.java)
@@ -47,7 +47,7 @@ class ListaComerciantesActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        cargarLista() // Refresca al volver de Agregar comerciante
+        cargarLista()
     }
 }
 
