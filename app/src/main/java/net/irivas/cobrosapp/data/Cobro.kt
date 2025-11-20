@@ -1,6 +1,6 @@
 package net.irivas.cobrosapp.data
 
-data class Pago(
+data class Cobro(
     val idCobro: Int = 0,
     val idCobrador: Int,
     val idPuesto: Int,
