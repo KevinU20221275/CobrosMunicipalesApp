@@ -1,4 +1,7 @@
 package net.irivas.cobrosapp.data
 
-class Comerciante {
-}
+data class Comerciante (
+    val idComerciante: Int,
+    val nombre: String,
+    val telefono: String
+)
