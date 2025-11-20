@@ -7,6 +7,22 @@
     android:gravity="center">
 
     <Button
+        android:id="@+id/btnListarComerciantes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Listar Comerciantes"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnRegistrarPuesto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Registrar Puesto"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
         android:id="@+id/btnRegistrarCobro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
