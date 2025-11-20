@@ -10,13 +10,18 @@ import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import net.irivas.cobrosapp.R
-import net.irivas.cobrosapp.data.Pago
-import net.irivas.cobrosapp.data.PagosDBHelper
+import net.irivas.cobrosapp.data.Cobro
+import net.irivas.cobrosapp.data.CobrosDBHelper
 import android.Manifest
 import android.app.DatePickerDialog
-import android.media.Image
 import android.os.Looper
+import android.util.Log
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import com.google.android.gms.location.LocationCallback
@@ -26,10 +31,9 @@ import com.google.android.gms.location.Priority
 import java.util.Calendar
 
 class RegistrarCobroActivity : AppCompatActivity() {
-    private lateinit var db : PagosDBHelper
+    private lateinit var db : CobrosDBHelper
 
-    private lateinit var inputNombre: EditText
-    private lateinit var inputPuesto: EditText
+    private lateinit var inputNombre: AutoCompleteTextView
     private lateinit var inputMonto: EditText
     private lateinit var inputRecibido: EditText
     private lateinit var inputVuelto: EditText
@@ -38,6 +42,10 @@ class RegistrarCobroActivity : AppCompatActivity() {
     private lateinit var btnGuardar: Button
     private lateinit var txtLatitud: TextView
     private lateinit var txtLongitud: TextView
+    private lateinit var spinnerPuesto: Spinner
+    private var idComercianteSeleccionado: Int = -1
+    private var idPuestoSeleccionado: Int = -1
+
 
     private lateinit var fusedLocation: FusedLocationProviderClient
     private var intentosGPS = 0
@@ -46,10 +54,10 @@ class RegistrarCobroActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registrar_cobro)
 
-        db = PagosDBHelper(this)
+        db = CobrosDBHelper(this)
 
         inputNombre = findViewById(R.id.inputNombre)
-        inputPuesto = findViewById(R.id.inputPuesto)
+        spinnerPuesto = findViewById(R.id.spinnerPuesto)
         inputMonto = findViewById(R.id.inputMonto)
         inputRecibido = findViewById(R.id.inputRecibido)
         inputVuelto = findViewById(R.id.inputVuelto)
@@ -59,6 +67,8 @@ class RegistrarCobroActivity : AppCompatActivity() {
         txtLatitud = findViewById(R.id.txtLatitud)
         txtLongitud = findViewById(R.id.txtLongitud)
 
+        // carga la lista de comerciantes para usarla en AutoCompleteTextView
+        cargarComerciantes()
 
         inputRecibido.addTextChangedListener {
             val monto = inputMonto.text.toString().toDoubleOrNull() ?: 0.0
@@ -81,6 +91,54 @@ class RegistrarCobroActivity : AppCompatActivity() {
             if (validarDatos() && gpsListo()) {
                 insertarPago()
             }
+        }
+    }
+
+    private fun cargarComerciantes() {
+        val lista = db.obtenerComerciantes() // retorna lista de objeto Comerciante
+
+        val nombres = lista.map { it.nombre }
+
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, nombres)
+        inputNombre.setAdapter(adapter)
+
+        // Evento: cuando seleccionan un comerciante
+        inputNombre.setOnItemClickListener { parent, _, pos, _ ->
+            val nombreSeleccionado = parent.getItemAtPosition(pos).toString()
+            val comerciante = lista.first{it.nombre == nombreSeleccionado}
+
+            Log.d("id","id del comerciante seleccionado ${comerciante.idComerciante}")
+            idComercianteSeleccionado = comerciante.idComerciante
+            cargarPuestos(comerciante.idComerciante)
+        }
+    }
+
+    private fun cargarPuestos(idComerciante: Int) {
+        Log.d("id", "id en cargar puestos: ${idComerciante}")
+        val puestos = db.obtenerPuestosPorComerciante(idComerciante)
+        Log.d("puestos", "Puestos encontrados: ${puestos}")
+        if (puestos.isEmpty()) {
+            // No tiene puestos: limpia y bloquea
+            spinnerPuesto.adapter = null
+            inputMonto.setText("")
+            Toast.makeText(this, "Este comerciante no tiene puestos asignados", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val nombresPuestos = puestos.map { "Puesto #${it.numero}" }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nombresPuestos)
+        spinnerPuesto.adapter = adapter
+
+        spinnerPuesto.setSelection(0)
+
+        spinnerPuesto.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
+                val puesto = puestos[pos]
+                idPuestoSeleccionado = puesto.id
+                inputMonto.setText(puesto.tarifa.toString()) // monto automático
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
     }
 
@@ -141,9 +199,7 @@ class RegistrarCobroActivity : AppCompatActivity() {
     }
 
     private fun validarDatos(): Boolean {
-
         val nombre = inputNombre.text.toString().trim()
-        val puestoStr = inputPuesto.text.toString().trim()
         val montoStr = inputMonto.text.toString().trim()
         val recibidoStr = inputRecibido.text.toString().trim()
         val fecha = inputFecha.text.toString().trim()
@@ -153,8 +209,8 @@ class RegistrarCobroActivity : AppCompatActivity() {
             return false
         }
 
-        if (puestoStr.isEmpty() || puestoStr.toIntOrNull() == null || puestoStr.toInt() <= 0) {
-            inputPuesto.error = "Puesto inválido"
+        if (idPuestoSeleccionado <= 0){
+            Toast.makeText(this, "Seleccione un puesto válido", Toast.LENGTH_SHORT).show()
             return false
         }
 
@@ -198,9 +254,6 @@ class RegistrarCobroActivity : AppCompatActivity() {
 
 
     private fun insertarPago() {
-
-        val nombre = inputNombre.text.toString().trim()
-        val puesto = inputPuesto.text.toString().toInt()
         val monto = inputMonto.text.toString().toDouble()
         val recibido = inputRecibido.text.toString().toDouble()
         val vuelto = recibido - monto
@@ -208,10 +261,10 @@ class RegistrarCobroActivity : AppCompatActivity() {
         val lat = txtLatitud.text.toString().replace("Latitud: ", "").toDouble()
         val lon = txtLongitud.text.toString().replace("Longitud: ", "").toDouble()
 
-        val pago = Pago(
-            id = 0,
-            nombre = nombre,
-            numeroPuesto = puesto.toString(),
+        val pago = Cobro(
+            idCobro = 0,
+            idCobrador = 1,
+            idPuesto = idPuestoSeleccionado,
             monto = monto,
             recibido = recibido,
             vuelto = vuelto,
@@ -220,7 +273,7 @@ class RegistrarCobroActivity : AppCompatActivity() {
             longitud = lon
         )
 
-        val resultado = db.insertarPago(pago)
+        val resultado = db.insertarCobro(pago)
 
         if (resultado) {
             Toast.makeText(this, "Cobro registrado", Toast.LENGTH_SHORT).show()
@@ -232,10 +285,14 @@ class RegistrarCobroActivity : AppCompatActivity() {
 
     private fun limpiarCampos() {
         inputNombre.text.clear()
-        inputPuesto.text.clear()
         inputMonto.text.clear()
         inputRecibido.text.clear()
+        inputVuelto.text.clear()
         inputFecha.text.clear()
+
+        idComercianteSeleccionado = -1
+        idPuestoSeleccionado = -1
+        spinnerPuesto.adapter = null
     }
 
     private fun verificarPermisos() {
