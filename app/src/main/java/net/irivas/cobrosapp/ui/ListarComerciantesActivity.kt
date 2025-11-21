@@ -38,11 +38,17 @@ class ListarComerciantesActivity : AppCompatActivity() {
     private fun cargarLista() {
         val lista = db.obtenerComerciantes()
         recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = ComercianteAdapter(lista) { comerciante ->
-            val intent = Intent(this, GestionarPuestoActivity::class.java)
-            intent.putExtra("ID_COMERCIANTE", comerciante.idComerciante)
-            startActivity(intent)
-        }
+        recycler.adapter = ComercianteAdapter(lista,
+            onGestionarPuestos = { comerciante ->
+                val intent = Intent(this, GestionarPuestoActivity::class.java)
+                intent.putExtra("ID_COMERCIANTE", comerciante.idComerciante)
+                startActivity(intent)
+            },
+            onEdit = { comerciante ->
+                val intent = Intent(this, RegistrarComercianteActivity::class.java)
+                intent.putExtra("ID_COMERCIANTE", comerciante.idComerciante)
+                startActivity(intent)
+            })
     }
 
     override fun onResume() {

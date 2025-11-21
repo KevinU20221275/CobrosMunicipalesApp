@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light">
+
+    <!-- Top App Bar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/topbar_height"
+        android:background="@color/primary"
+        app:title="Formulario Comerciante"
+        app:titleTextColor="@android:color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingStart="8dp"
+        android:paddingEnd="0dp" />
+
+    <ScrollView
+        android:id="@+id/scrollForm"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toTopOf="@id/btnGuardarComerciante"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="12dp"
+            android:paddingBottom="8dp"
+            android:background="@color/background_light">
+
+            <!-- TÍTULO -->
+            <TextView
+                android:id="@+id/tituloPantalla"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Registrar Comerciante"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:paddingTop="0dp"
+                android:paddingBottom="10dp"
+                android:textColor="#333333"/>
+
+            <TextView
+                android:text="Nombre del comerciante"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginTop="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <EditText
+                android:id="@+id/inputNombreComerciante"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@drawable/input_bg"
+                android:padding="14dp"
+                android:textColor="#333333"
+                android:textSize="16sp"
+                android:hint="Nombre del comerciante" />
+
+            <TextView
+                android:text="Numero de Telefono (sin guion)"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:paddingTop="12dp"
+                android:textColor="#333333"
+                android:layout_marginTop="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <EditText
+                android:id="@+id/inputTelefonoComerciante"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@drawable/input_bg"
+                android:padding="14dp"
+                android:textColor="#333333"
+                android:textSize="16sp"
+                android:hint="70890000" />
+
+
+        </LinearLayout>
+    </ScrollView>
+    <Button
+        android:id="@+id/btnGuardarComerciante"
+        android:text="Guardar Comerciante"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

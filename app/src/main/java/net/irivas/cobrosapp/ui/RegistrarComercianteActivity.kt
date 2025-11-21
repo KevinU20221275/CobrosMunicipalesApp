@@ -3,6 +3,7 @@ package net.irivas.cobrosapp.ui
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.isDigitsOnly
@@ -14,15 +15,26 @@ class RegistrarComercianteActivity : AppCompatActivity() {
     private lateinit var inputNombre: EditText
     private lateinit var inputTelefono: EditText
     private lateinit var btnGuardar: Button
+    private lateinit var titulo : TextView
+
+    private var idComerciante: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_registrar_comerciante)
+        setContentView(R.layout.activity_formulario_comerciante)
 
         db = CobrosDBHelper(this)
+        idComerciante = intent.getIntExtra("ID_COMERCIANTE", 0)
+
+        titulo = findViewById(R.id.tituloPantalla)
         inputNombre = findViewById(R.id.inputNombreComerciante)
         inputTelefono = findViewById(R.id.inputTelefonoComerciante)
         btnGuardar = findViewById(R.id.btnGuardarComerciante)
+
+        if (idComerciante > 0){
+            titulo.setText("Actualizar Comerciante")
+            cargarData()
+        }
 
         btnGuardar.setOnClickListener {
             val nombre = inputNombre.text.toString().trim()
@@ -38,14 +50,24 @@ class RegistrarComercianteActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val ok = db.insertarComerciante(nombre, telefono.toString())
+            val ok = db.guardarComerciante(idComerciante, nombre, telefono.toString())
 
             Toast.makeText(this,
                 if (ok) "Comerciante guardado" else "Error al guardar",
                 Toast.LENGTH_SHORT
             ).show()
 
-            if (ok) inputNombre.text.clear()
+            if (ok) {
+                inputNombre.text.clear()
+                inputTelefono.text.clear()
+            }
         }
+    }
+
+    private fun cargarData(){
+        var comerciante = db.obtenerComerciante(idComerciante)
+
+        inputNombre.setText(comerciante.nombre)
+        inputTelefono.setText(comerciante.telefono)
     }
 }

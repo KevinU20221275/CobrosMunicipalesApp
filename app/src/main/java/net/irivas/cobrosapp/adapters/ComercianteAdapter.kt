@@ -11,13 +11,15 @@ import net.irivas.cobrosapp.R
 
 class ComercianteAdapter(
     private val lista: List<Comerciante>,
-    private val onGestionarPuestos: (Comerciante) -> Unit
+    private val onGestionarPuestos: (Comerciante) -> Unit,
+    private val onEdit : (Comerciante) -> Unit
 ) : RecyclerView.Adapter<ComercianteAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val nombre = view.findViewById<TextView>(R.id.txtNombreComerciante)
         val telefono = view.findViewById<TextView>(R.id.txtTelefono)
         val btnPuestos = view.findViewById<Button>(R.id.btnGestionarPuestos)
+        val btnEditar = view.findViewById<Button>(R.id.btnEditarComerciante)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -33,6 +35,10 @@ class ComercianteAdapter(
 
         holder.btnPuestos.setOnClickListener {
             onGestionarPuestos(com)
+        }
+
+        holder.btnEditar.setOnClickListener {
+            onEdit(com)
         }
     }
 

@@ -95,13 +95,21 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         return resultado != -1L
     }
 
-    fun insertarComerciante(nombre: String, telefono: String): Boolean {
+    fun guardarComerciante(idComerciante: Int?, nombre: String, telefono: String): Boolean {
         val db = writableDatabase
         val values = ContentValues()
         values.put("nombre", nombre)
         values.put("telefono", telefono)
-        val res = db.insert("comerciante", null, values)
-        return res != -1L
+
+        return if (idComerciante != null && idComerciante > 0){
+            val res = db.update("comerciante", values, "id_comerciante = ?",
+                arrayOf(idComerciante.toString()))
+            res > 0
+        } else {
+            val res = db.insert("comerciante", null, values)
+            res != -1L
+        }
+
     }
 
     fun insertarPuesto(numero: Int, tarifa: Double): Boolean {
