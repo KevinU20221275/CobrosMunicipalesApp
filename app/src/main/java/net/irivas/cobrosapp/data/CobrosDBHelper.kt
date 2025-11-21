@@ -75,7 +75,7 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
     }
 
     // insertar registros
-    fun insertarCobro(cobro: Cobro): Boolean {
+    fun guardarCobro(cobro: Cobro): Boolean {
         val db = writableDatabase
         val values = ContentValues()
 
@@ -88,11 +88,14 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         values.put("latitud", cobro.latitud)
         values.put("longitud", cobro.longitud)
 
-        val resultado = db.insert("cobro", null, values)
-
-        db.close()
-
-        return resultado != -1L
+        return if (cobro.idCobro > 0){
+            val res = db.update("cobro", values, "id_cobro = ?",
+                arrayOf(cobro.idCobro.toString()))
+            res > 0
+        } else {
+            val res = db.insert("cobro", null, values)
+            res != -1L
+        }
     }
 
     fun guardarComerciante(idComerciante: Int?, nombre: String, telefono: String): Boolean {
@@ -143,13 +146,13 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         val db = writableDatabase
         return try {
             for (idPuesto in puestos) {
-                // 1) Insertar relación en la tabla intermedia
+                // Insertar relación en la tabla intermedia
                 db.execSQL("""
                 INSERT INTO comerciante_puesto (id_comerciante, id_puesto)
                 VALUES (?, ?)
             """.trimIndent(), arrayOf(idComerciante, idPuesto))
 
-                // 2) Actualizar disponibilidad del puesto
+                // Actualizar disponibilidad del puesto
                 db.execSQL("""
                 UPDATE puesto SET disponible = 0
                 WHERE id_puesto = ?
@@ -273,13 +276,6 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         val lista = mutableListOf<Puesto>()
         val db = readableDatabase
 
-        var cursor = db.rawQuery("SELECT * FROM comerciante_puesto", null)
-        Log.d("DB_DEBUG", "Comerciante_puesto count: ${cursor.count}")
-        while(cursor.moveToNext()){
-            Log.d("DB_DEBUG", "id_comerciante=${cursor.getInt(0)}, id_puesto=${cursor.getInt(1)}")
-        }
-        cursor.close()
-
         val sql = """
         SELECT p.id_puesto, p.numero, p.tarifa, p.disponible
         FROM puesto p
@@ -288,9 +284,7 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         WHERE cp.id_comerciante = ?
     """.trimIndent()
 
-        Log.d("DB_DEBUG", "Ejecutando query para idComerciante=$idComerciante")
-        cursor = db.rawQuery(sql, arrayOf(idComerciante.toString()))
-        Log.d("DB_DEBUG", "Cursor count: ${cursor.count}")
+        var cursor = db.rawQuery(sql, arrayOf(idComerciante.toString()))
 
         if (cursor.moveToFirst()) {
             do {
@@ -298,8 +292,6 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
                 val numero = cursor.getString(1)
                 val tarifa = cursor.getDouble(2)
                 val disponible = cursor.getInt(3)
-
-                Log.d("DB_DEBUG", "Fila encontrada: id=$id, numero=$numero, tarifa=$tarifa, disponible=$disponible")
 
                 lista.add(Puesto(id = id, numero = numero, tarifa = tarifa, disponible = disponible))
             } while (cursor.moveToNext())
@@ -311,7 +303,6 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         db.close()
         return lista
     }
-
 
     // listar todos los cobros
     fun obtenerCobrosConInfo(): List<CobroDTO> {
@@ -345,6 +336,51 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         db.close()
         return lista
     }
+
+    fun obtenerCobroParaEditar(idCobro: Int): CobroEditarDTO? {
+        val db = readableDatabase
+
+        val cursor = db.rawQuery("""
+        SELECT 
+            c.id_cobro,
+            com.id_comerciante,
+            p.id_puesto,
+            c.monto,
+            c.recibido,
+            c.vuelto,
+            c.fecha,
+            c.latitud,
+            c.longitud
+        FROM cobro c
+        INNER JOIN puesto p ON c.id_puesto = p.id_puesto
+        INNER JOIN comerciante_puesto cp ON p.id_puesto = cp.id_puesto
+        INNER JOIN comerciante com ON cp.id_comerciante = com.id_comerciante
+        WHERE c.id_cobro = ?
+        LIMIT 1
+    """.trimIndent(), arrayOf(idCobro.toString()))
+
+        var cobro: CobroEditarDTO? = null
+
+        if (cursor.moveToFirst()) {
+            cobro = CobroEditarDTO(
+                cursor.getInt(0),  // idCobro
+                cursor.getInt(1),  // idComerciante
+                cursor.getInt(2),  // idPuesto
+                cursor.getDouble(3),
+                cursor.getDouble(4),
+                cursor.getDouble(5),
+                cursor.getString(6),
+                cursor.getDouble(7),
+                cursor.getDouble(8)
+            )
+        }
+
+        cursor.close()
+        db.close()
+        return cobro
+    }
+
+
 
     // buscar por nombre o puesto
     fun buscarCobros(query: String): List<Cobro> {

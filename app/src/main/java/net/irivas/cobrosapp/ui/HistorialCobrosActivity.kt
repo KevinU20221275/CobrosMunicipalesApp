@@ -1,35 +1,38 @@
 package net.irivas.cobrosapp.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import net.irivas.cobrosapp.R
 import net.irivas.cobrosapp.adapters.CobrosAdapter
 import net.irivas.cobrosapp.data.CobroDTO
 import net.irivas.cobrosapp.data.CobrosDBHelper
 
-class HistorialActivity : AppCompatActivity() {
+class HistorialCobrosActivity : AppCompatActivity() {
     private lateinit var recyclerPagos: RecyclerView
     private lateinit var adapter: CobrosAdapter
     private lateinit var inputSearch: EditText
     private lateinit var txtTotal: TextView
     private lateinit var db: CobrosDBHelper
-
+    private lateinit var btnAgregar: FloatingActionButton
 
     private val listaOriginal = mutableListOf<CobroDTO>()
     private val listaFiltrada = mutableListOf<CobroDTO>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_historial)
+        setContentView(R.layout.activity_historial_cobros)
 
         db = CobrosDBHelper(this)
         recyclerPagos = findViewById(R.id.recyclerPagos)
         inputSearch = findViewById(R.id.inputSearch)
         txtTotal = findViewById(R.id.txtTotalValue)
+        btnAgregar = findViewById(R.id.btnAgregarCobro)
 
         // limpia las listas al iniciar
         listaOriginal.clear()
@@ -41,13 +44,31 @@ class HistorialActivity : AppCompatActivity() {
         // copia la lista original a la lista que usaremos para filtrar
         listaFiltrada.addAll(listaOriginal)
 
-        adapter = CobrosAdapter(listaFiltrada, db)
+        adapter = CobrosAdapter(listaFiltrada,
+            onEdit = { cobro ->
+                val intent = Intent(this, FormularioCobroActivity::class.java)
+                intent.putExtra("ID_COBRO", cobro.idCobro)
+                startActivity(intent)
+            }
+            ,db,)
         recyclerPagos.layoutManager = LinearLayoutManager(this)
         recyclerPagos.adapter = adapter
 
         calcularTotal()
 
+        btnAgregar.setOnClickListener {
+            startActivity(Intent(this, FormularioCobroActivity::class.java))
+        }
+
         //configurarBusqueda()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        listaOriginal.clear()
+        listaOriginal.addAll(db.obtenerCobrosConInfo())
+
+        adapter.actualizarLista(listaOriginal)
     }
 
     /* private fun configurarBusqueda() {

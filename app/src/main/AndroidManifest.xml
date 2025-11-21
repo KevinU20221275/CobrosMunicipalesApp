@@ -30,10 +30,10 @@
             android:name=".ui.FormularioComercianteActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.RegistrarCobroActivity"
+            android:name=".ui.FormularioCobroActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.HistorialActivity"
+            android:name=".ui.HistorialCobrosActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
