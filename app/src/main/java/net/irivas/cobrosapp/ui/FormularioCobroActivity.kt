@@ -14,6 +14,7 @@ import net.irivas.cobrosapp.data.Cobro
 import net.irivas.cobrosapp.data.CobrosDBHelper
 import android.Manifest
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Looper
 import android.util.Log
 import android.view.View
@@ -28,9 +29,10 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
+import net.irivas.cobrosapp.data.Comerciante
 import java.util.Calendar
 
-class RegistrarCobroActivity : AppCompatActivity() {
+class FormularioCobroActivity : AppCompatActivity() {
     private lateinit var db : CobrosDBHelper
 
     private lateinit var inputNombre: AutoCompleteTextView
@@ -43,16 +45,17 @@ class RegistrarCobroActivity : AppCompatActivity() {
     private lateinit var txtLatitud: TextView
     private lateinit var txtLongitud: TextView
     private lateinit var spinnerPuesto: Spinner
+    private lateinit var comerciantes: List<Comerciante>
     private var idComercianteSeleccionado: Int = -1
     private var idPuestoSeleccionado: Int = -1
-
-
     private lateinit var fusedLocation: FusedLocationProviderClient
     private var intentosGPS = 0
 
+    private var idCobro:Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_registrar_cobro)
+        setContentView(R.layout.activity_formulario_cobro)
 
         db = CobrosDBHelper(this)
 
@@ -86,18 +89,41 @@ class RegistrarCobroActivity : AppCompatActivity() {
 
         obtenerUbicacion()
 
+        idCobro = intent.getIntExtra("ID_COBRO", 0)
+
+        if (idCobro > 0){
+            val data = db.obtenerCobroParaEditar(idCobro)
+
+            if (data != null){
+                val comerciante = comerciantes.firstOrNull{it.idComerciante == data.idComerciante}
+                inputNombre.setText(comerciante?.nombre ?: "",false)
+                inputNombre.isEnabled = false // No Editable
+
+                inputRecibido.setText(data.recibido.toString())
+                inputVuelto.setText(data.vuelto.toString())
+                inputFecha.setText(data.fecha)
+
+                txtLatitud.text = "Latitud: ${data.latitud}"
+                txtLongitud.text = "Longitud: ${data.longitud}"
+
+                cargarPuestos(data.idComerciante, data.idPuesto)
+            }
+        }
+
         // BOTÓN GUARDAR
         btnGuardar.setOnClickListener {
             if (validarDatos() && gpsListo()) {
-                insertarPago()
+                guardarCobro()
+            } else {
+                return@setOnClickListener
             }
         }
     }
 
     private fun cargarComerciantes() {
-        val lista = db.obtenerComerciantes() // retorna lista de objeto Comerciante
+        comerciantes = db.obtenerComerciantes() // retorna lista de objeto Comerciante
 
-        val nombres = lista.map { it.nombre }
+        val nombres = comerciantes.map { it.nombre }
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, nombres)
         inputNombre.setAdapter(adapter)
@@ -105,18 +131,16 @@ class RegistrarCobroActivity : AppCompatActivity() {
         // Evento: cuando seleccionan un comerciante
         inputNombre.setOnItemClickListener { parent, _, pos, _ ->
             val nombreSeleccionado = parent.getItemAtPosition(pos).toString()
-            val comerciante = lista.first{it.nombre == nombreSeleccionado}
+            val comerciante = comerciantes.first{it.nombre == nombreSeleccionado}
 
-            Log.d("id","id del comerciante seleccionado ${comerciante.idComerciante}")
             idComercianteSeleccionado = comerciante.idComerciante
             cargarPuestos(comerciante.idComerciante)
         }
     }
 
-    private fun cargarPuestos(idComerciante: Int) {
-        Log.d("id", "id en cargar puestos: ${idComerciante}")
+    private fun cargarPuestos(idComerciante: Int, idPuestoEditar:Int? = null) {
         val puestos = db.obtenerPuestosPorComerciante(idComerciante)
-        Log.d("puestos", "Puestos encontrados: ${puestos}")
+
         if (puestos.isEmpty()) {
             // No tiene puestos: limpia y bloquea
             spinnerPuesto.adapter = null
@@ -129,7 +153,14 @@ class RegistrarCobroActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nombresPuestos)
         spinnerPuesto.adapter = adapter
 
-        spinnerPuesto.setSelection(0)
+        if (idPuestoEditar != null){
+            // si se esta editando deja seleccionado el puesto correspondiente
+            val index = puestos.indexOfFirst { it.id == idPuestoEditar }
+            if (index != -1) spinnerPuesto.setSelection(index)
+        } else {
+            // si no selecciona el primero por default
+            spinnerPuesto.setSelection(0)
+        }
 
         spinnerPuesto.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
@@ -175,7 +206,7 @@ class RegistrarCobroActivity : AppCompatActivity() {
                         if (intentosGPS <= 3){
                             obtenerUbicacion()
                         } else {
-                            Toast.makeText(this@RegistrarCobroActivity, "No se pudo obtener la ubicación", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@FormularioCobroActivity, "No se pudo obtener la ubicación", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -241,10 +272,10 @@ class RegistrarCobroActivity : AppCompatActivity() {
     }
 
     private fun gpsListo(): Boolean {
-        val lat = txtLatitud.text.toString().trim()
-        val lon = txtLongitud.text.toString().trim()
+        val lat = txtLatitud.text.toString().replace("Latitud:", "").trim()
+        val lon = txtLongitud.text.toString().replace("Longitud:", "").trim()
 
-        if (lat.endsWith(": -") || lon.endsWith(": -")) {
+        if (lat.isBlank() || lon.isBlank() || lat == "-" || lon == "-") {
             Toast.makeText(this, "Esperando GPS... Por favor active el GPS", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -253,7 +284,7 @@ class RegistrarCobroActivity : AppCompatActivity() {
     }
 
 
-    private fun insertarPago() {
+    private fun guardarCobro() {
         val monto = inputMonto.text.toString().toDouble()
         val recibido = inputRecibido.text.toString().toDouble()
         val vuelto = recibido - monto
@@ -261,8 +292,8 @@ class RegistrarCobroActivity : AppCompatActivity() {
         val lat = txtLatitud.text.toString().replace("Latitud: ", "").toDouble()
         val lon = txtLongitud.text.toString().replace("Longitud: ", "").toDouble()
 
-        val pago = Cobro(
-            idCobro = 0,
+        val cobro = Cobro(
+            idCobro = idCobro,
             idCobrador = 1,
             idPuesto = idPuestoSeleccionado,
             monto = monto,
@@ -273,26 +304,19 @@ class RegistrarCobroActivity : AppCompatActivity() {
             longitud = lon
         )
 
-        val resultado = db.insertarCobro(pago)
+        val ok = db.guardarCobro(cobro)
 
-        if (resultado) {
-            Toast.makeText(this, "Cobro registrado", Toast.LENGTH_SHORT).show()
-            limpiarCampos()
+        if (ok) {
+            var message = if (idCobro > 0) "Cobro Actualizado" else "Cobro Guardado"
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+            val returnIntent = Intent()
+            setResult(RESULT_OK, returnIntent)
+
+            finish()
         } else {
             Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun limpiarCampos() {
-        inputNombre.text.clear()
-        inputMonto.text.clear()
-        inputRecibido.text.clear()
-        inputVuelto.text.clear()
-        inputFecha.text.clear()
-
-        idComercianteSeleccionado = -1
-        idPuestoSeleccionado = -1
-        spinnerPuesto.adapter = null
     }
 
     private fun verificarPermisos() {

@@ -25,7 +25,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="12dp"
+        android:paddingTop="1dp"
         android:paddingBottom="8dp"
         android:background="@color/background_light"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
@@ -36,7 +36,7 @@
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -312,7 +312,7 @@
             android:text="Guardar"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:background="#2B8CEE"
+            android:backgroundTint="@color/primary"
             android:layout_gravity="bottom"
             android:layout_margin="16dp"
             android:gravity="center"/>

@@ -52,6 +52,19 @@
                 android:text="10:45 AM, 23/10/2023"
                 android:textSize="13sp"
                 android:textColor="@color/text_secondary"/>
+
+            <ImageView
+                android:id="@+id/btnEdit"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:padding="4dp"
+                android:src="@drawable/ic_edit"
+                android:tint="@color/primary"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                />
+
         </LinearLayout>
 
         <!-- Divider -->
