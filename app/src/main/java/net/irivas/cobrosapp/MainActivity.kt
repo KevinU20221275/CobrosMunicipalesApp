@@ -6,8 +6,8 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import net.irivas.cobrosapp.ui.HistorialActivity
 import net.irivas.cobrosapp.ui.ListarComerciantesActivity
+import net.irivas.cobrosapp.ui.ListarPuestosActivity
 import net.irivas.cobrosapp.ui.RegistrarCobroActivity
-import net.irivas.cobrosapp.ui.RegistrarPuestoActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnRegistrarPuesto).setOnClickListener {
-            startActivity(Intent(this, RegistrarPuestoActivity::class.java))
+            startActivity(Intent(this, ListarPuestosActivity::class.java))
         }
 
         findViewById<Button>(R.id.btnRegistrarCobro).setOnClickListener {
