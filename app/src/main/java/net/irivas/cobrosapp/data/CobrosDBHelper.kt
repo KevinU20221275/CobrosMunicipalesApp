@@ -112,15 +112,31 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
 
     }
 
-    fun insertarPuesto(numero: Int, tarifa: Double): Boolean {
+    fun guardarPuesto(idPuesto: Int?, numero: Int, tarifa: Double): Boolean {
         val db = writableDatabase
         val values = ContentValues()
-
         values.put("numero", numero)
         values.put("tarifa", tarifa)
 
-        val res = db.insert("puesto", null, values)
-        return res != -1L
+        return if (idPuesto != null && idPuesto > 0) {
+            val cursor = db.rawQuery(
+                "SELECT id_puesto FROM puesto WHERE numero = ? AND id_puesto != ?",
+                arrayOf(numero.toString(), idPuesto.toString())
+            )
+            val existe = cursor.count > 0
+            cursor.close()
+
+            if (existe) {
+                false // No se puede actualizar, número duplicado
+            } else {
+                val res = db.update("puesto", values, "id_puesto = ?", arrayOf(idPuesto.toString()))
+                res > 0
+            }
+        } else {
+            // Insertar
+            val res = db.insert("puesto", null, values)
+            res != -1L
+        }
     }
 
     fun asignarPuestosAComerciante(idComerciante: Int, puestos: List<Int>): Boolean {
@@ -177,6 +193,26 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
             SELECT id_puesto, numero, tarifa, disponible 
             FROM puesto 
             WHERE disponible = 1
+        """, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                lista.add(
+                    Puesto(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getInt(3))
+                )
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return lista
+    }
+
+    fun obtenerPuestos(): List<Puesto> {
+        val lista = mutableListOf<Puesto>()
+        val db = readableDatabase
+        val cursor = db.rawQuery("""
+            SELECT id_puesto, numero, tarifa, disponible 
+            FROM puesto
         """, null)
 
         if (cursor.moveToFirst()) {
