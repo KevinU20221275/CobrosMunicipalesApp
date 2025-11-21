@@ -15,13 +15,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CobrosApp">
         <activity
+            android:name=".ui.ListarPuestosActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.ListarComerciantesActivity"
             android:exported="false" />
         <activity
             android:name=".ui.GestionarPuestoActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.RegistrarPuestoActivity"
+            android:name=".ui.FormularioPuestoActivity"
             android:exported="false" />
         <activity
             android:name=".ui.FormularioComercianteActivity"
