@@ -3,6 +3,7 @@ package net.irivas.cobrosapp.ui
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,15 +18,26 @@ class RegistrarPuestoActivity : AppCompatActivity() {
     private lateinit var inputNumero: EditText
     private lateinit var inputTarifa: EditText
     private lateinit var btnGuardar: Button
+    private lateinit var titulo : TextView
+
+    private var idPuesto : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registrar_puesto)
 
         db = CobrosDBHelper(this)
+        idPuesto = intent.getIntExtra("ID_PUESTO", 0)
+
+        titulo = findViewById(R.id.tituloPantalla)
         inputNumero = findViewById(R.id.inputNumeroPuesto)
         inputTarifa = findViewById(R.id.inputTarifa)
         btnGuardar = findViewById(R.id.btnGuardarPuesto)
+
+        if (idPuesto > 0){
+            titulo.setText("Actualizar Puesto")
+            cargarData()
+        }
 
         btnGuardar.setOnClickListener { guardarPuesto() }
     }
@@ -47,7 +59,7 @@ class RegistrarPuestoActivity : AppCompatActivity() {
         val numero = numeroStr.toInt()
         val tarifa = tarifaStr.toDouble()
 
-        val resultado = db.insertarPuesto(numero, tarifa)
+        val resultado = db.guardarPuesto(idPuesto, numero, tarifa)
 
         if (resultado) {
             Toast.makeText(this, "Puesto registrado", Toast.LENGTH_SHORT).show()
@@ -56,5 +68,12 @@ class RegistrarPuestoActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Error al guardar (¿duplicado?)", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun cargarData(){
+        var puesto = db.obtenerPuesto(idPuesto)
+
+        inputNumero.setText(puesto?.numero)
+        inputTarifa.setText(puesto?.tarifa.toString())
     }
 }
