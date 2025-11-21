@@ -10,7 +10,7 @@ import net.irivas.cobrosapp.data.Comerciante
 import net.irivas.cobrosapp.R
 
 class ComercianteAdapter(
-    private val lista: List<Comerciante>,
+    private val listaMostrada: MutableList<Comerciante>,
     private val onGestionarPuestos: (Comerciante) -> Unit,
     private val onEdit : (Comerciante) -> Unit
 ) : RecyclerView.Adapter<ComercianteAdapter.ViewHolder>() {
@@ -29,7 +29,7 @@ class ComercianteAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val com = lista[position]
+        val com = listaMostrada[position]
         holder.nombre.text = "Nombre: ${com.nombre}"
         holder.telefono.text = "Telefono: ${com.telefono}"
 
@@ -40,8 +40,26 @@ class ComercianteAdapter(
         holder.btnEditar.setOnClickListener {
             onEdit(com)
         }
+
+        animarItem(holder.itemView)
     }
 
-    override fun getItemCount(): Int = lista.size
+    override fun getItemCount(): Int = listaMostrada.size
+
+    fun actualizarLista(nuevaLista: List<Comerciante>) {
+        listaMostrada.clear()
+        listaMostrada.addAll(nuevaLista)
+        notifyDataSetChanged()
+    }
+
+    private fun animarItem(view: View) {
+        view.alpha = 0f
+        view.translationY = 30f
+        view.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(200)
+            .start()
+    }
 }
 

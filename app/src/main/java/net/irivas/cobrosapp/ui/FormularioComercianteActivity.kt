@@ -1,5 +1,6 @@
 package net.irivas.cobrosapp.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -52,14 +53,17 @@ class FormularioComercianteActivity : AppCompatActivity() {
 
             val ok = db.guardarComerciante(idComerciante, nombre, telefono.toString())
 
-            Toast.makeText(this,
-                if (ok) "Comerciante guardado" else "Error al guardar",
-                Toast.LENGTH_SHORT
-            ).show()
-
             if (ok) {
-                inputNombre.text.clear()
-                inputTelefono.text.clear()
+                var message = if (idComerciante > 0) "Comerciante Actualizado" else "Comerciante Guardado"
+
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+                val returnIntent = Intent()
+                setResult(RESULT_OK, returnIntent)
+
+                finish()
+            } else {
+                Toast.makeText(this,"Error al guardar", Toast.LENGTH_SHORT).show()
             }
         }
     }

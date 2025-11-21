@@ -253,7 +253,7 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         val lista = mutableListOf<Comerciante>()
 
         val db = readableDatabase
-        val cursor = db.rawQuery("SELECT id_comerciante, nombre, telefono FROM comerciante ORDER BY nombre", null)
+        val cursor = db.rawQuery("SELECT id_comerciante, nombre, telefono FROM comerciante ORDER BY id_comerciante ASC", null)
 
         if (cursor.moveToFirst()) {
             do {
