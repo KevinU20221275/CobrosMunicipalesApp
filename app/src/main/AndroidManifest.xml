@@ -24,7 +24,7 @@
             android:name=".ui.RegistrarPuestoActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.RegistrarComercianteActivity"
+            android:name=".ui.FormularioComercianteActivity"
             android:exported="false" />
         <activity
             android:name=".ui.RegistrarCobroActivity"

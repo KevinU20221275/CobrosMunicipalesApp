@@ -10,7 +10,7 @@ import androidx.core.text.isDigitsOnly
 import net.irivas.cobrosapp.R
 import net.irivas.cobrosapp.data.CobrosDBHelper
 
-class RegistrarComercianteActivity : AppCompatActivity() {
+class FormularioComercianteActivity : AppCompatActivity() {
     private lateinit var db: CobrosDBHelper
     private lateinit var inputNombre: EditText
     private lateinit var inputTelefono: EditText

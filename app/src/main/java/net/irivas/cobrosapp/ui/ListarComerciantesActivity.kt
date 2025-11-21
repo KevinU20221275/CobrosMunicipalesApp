@@ -2,10 +2,7 @@ package net.irivas.cobrosapp.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -31,7 +28,7 @@ class ListarComerciantesActivity : AppCompatActivity() {
         cargarLista()
 
         btnAgregar.setOnClickListener {
-            startActivity(Intent(this, RegistrarComercianteActivity::class.java))
+            startActivity(Intent(this, FormularioComercianteActivity::class.java))
         }
     }
 
@@ -45,7 +42,7 @@ class ListarComerciantesActivity : AppCompatActivity() {
                 startActivity(intent)
             },
             onEdit = { comerciante ->
-                val intent = Intent(this, RegistrarComercianteActivity::class.java)
+                val intent = Intent(this, FormularioComercianteActivity::class.java)
                 intent.putExtra("ID_COMERCIANTE", comerciante.idComerciante)
                 startActivity(intent)
             })
