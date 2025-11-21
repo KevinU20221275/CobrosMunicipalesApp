@@ -1,18 +1,16 @@
 package net.irivas.cobrosapp.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import net.irivas.cobrosapp.R
 import net.irivas.cobrosapp.data.CobrosDBHelper
 
-class RegistrarPuestoActivity : AppCompatActivity() {
+class FormularioPuestoActivity : AppCompatActivity() {
 
     private lateinit var db: CobrosDBHelper
     private lateinit var inputNumero: EditText
@@ -24,7 +22,7 @@ class RegistrarPuestoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_registrar_puesto)
+        setContentView(R.layout.activity_formulario_puesto)
 
         db = CobrosDBHelper(this)
         idPuesto = intent.getIntExtra("ID_PUESTO", 0)
@@ -62,9 +60,14 @@ class RegistrarPuestoActivity : AppCompatActivity() {
         val resultado = db.guardarPuesto(idPuesto, numero, tarifa)
 
         if (resultado) {
-            Toast.makeText(this, "Puesto registrado", Toast.LENGTH_SHORT).show()
-            inputNumero.text.clear()
-            inputTarifa.text.clear()
+            var message = if (idPuesto > 0) "Puesto Actualizado" else "Puesto Guardado"
+
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+            val returnIntent = Intent()
+            setResult(RESULT_OK, returnIntent)
+
+            finish()
         } else {
             Toast.makeText(this, "Error al guardar (¿duplicado?)", Toast.LENGTH_SHORT).show()
         }

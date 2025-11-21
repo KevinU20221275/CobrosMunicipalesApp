@@ -21,7 +21,8 @@
         android:paddingStart="8dp"
         android:paddingEnd="8dp" />
 
-    <FrameLayout
+    <ScrollView
+        android:id="@+id/formContent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -90,15 +91,17 @@
                 android:textSize="16sp"
                 android:inputType="numberDecimal"
                 android:hint="Ej: 1.50" />
-
-            <Button
-                android:id="@+id/btnGuardarPuesto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Guardar"
-                android:padding="10dp"
-                android:layout_marginTop="25dp"/>
-
         </LinearLayout>
-    </FrameLayout>
+    </ScrollView>
+    <Button
+        android:id="@+id/btnGuardarPuesto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/primary"
+        android:text="Guardar"
+        android:padding="10dp"
+        android:layout_margin="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
