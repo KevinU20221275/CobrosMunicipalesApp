@@ -294,6 +294,7 @@ class FormularioCobroActivity : AppCompatActivity() {
 
         val cobro = Cobro(
             idCobro = idCobro,
+            idComerciante = idComercianteSeleccionado,
             idCobrador = 1,
             idPuesto = idPuestoSeleccionado,
             monto = monto,
