@@ -46,6 +46,7 @@ class FormularioCobroActivity : AppCompatActivity() {
     private lateinit var txtLongitud: TextView
     private lateinit var spinnerPuesto: Spinner
     private lateinit var comerciantes: List<Comerciante>
+    private lateinit var titulo : TextView
     private var idComercianteSeleccionado: Int = -1
     private var idPuestoSeleccionado: Int = -1
     private lateinit var fusedLocation: FusedLocationProviderClient
@@ -69,6 +70,7 @@ class FormularioCobroActivity : AppCompatActivity() {
         btnGuardar = findViewById(R.id.btnGuardar)
         txtLatitud = findViewById(R.id.txtLatitud)
         txtLongitud = findViewById(R.id.txtLongitud)
+        titulo = findViewById(R.id.tituloPantalla)
 
         // carga la lista de comerciantes para usarla en AutoCompleteTextView
         cargarComerciantes()
@@ -93,6 +95,7 @@ class FormularioCobroActivity : AppCompatActivity() {
 
         if (idCobro > 0){
             val data = db.obtenerCobroParaEditar(idCobro)
+            titulo.setText("Actualizar Cobro")
 
             if (data != null){
                 val comerciante = comerciantes.firstOrNull{it.idComerciante == data.idComerciante}
@@ -102,6 +105,7 @@ class FormularioCobroActivity : AppCompatActivity() {
                 inputRecibido.setText(data.recibido.toString())
                 inputVuelto.setText(data.vuelto.toString())
                 inputFecha.setText(data.fecha)
+                idComercianteSeleccionado = data.idComerciante
 
                 txtLatitud.text = "Latitud: ${data.latitud}"
                 txtLongitud.text = "Longitud: ${data.longitud}"
@@ -139,7 +143,15 @@ class FormularioCobroActivity : AppCompatActivity() {
     }
 
     private fun cargarPuestos(idComerciante: Int, idPuestoEditar:Int? = null) {
-        val puestos = db.obtenerPuestosPorComerciante(idComerciante)
+        var puestos = db.obtenerPuestosPorComerciante(idComerciante)
+
+        // el comerciante ya no tiene el puesto asignado pero se esta editando el registro
+        if (puestos.isEmpty() && idPuestoEditar != null){
+            val puestoAnterior = db.obtenerPuesto(idPuestoEditar)
+            if (puestoAnterior != null){
+                puestos = listOf(puestoAnterior)
+            }
+        }
 
         if (puestos.isEmpty()) {
             // No tiene puestos: limpia y bloquea
@@ -153,6 +165,7 @@ class FormularioCobroActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nombresPuestos)
         spinnerPuesto.adapter = adapter
 
+        // selecciona el puesto correcto si se esta editando
         if (idPuestoEditar != null){
             // si se esta editando deja seleccionado el puesto correspondiente
             val index = puestos.indexOfFirst { it.id == idPuestoEditar }
@@ -291,6 +304,7 @@ class FormularioCobroActivity : AppCompatActivity() {
         val fecha = inputFecha.text.toString().trim()
         val lat = txtLatitud.text.toString().replace("Latitud: ", "").toDouble()
         val lon = txtLongitud.text.toString().replace("Longitud: ", "").toDouble()
+        Log.d("comerciante: ", idComercianteSeleccionado.toString())
 
         val cobro = Cobro(
             idCobro = idCobro,
