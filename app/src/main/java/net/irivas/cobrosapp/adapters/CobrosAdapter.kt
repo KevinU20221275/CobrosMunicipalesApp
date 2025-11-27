@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
 import net.irivas.cobrosapp.R
 import net.irivas.cobrosapp.data.CobroDTO
@@ -15,6 +16,7 @@ import net.irivas.cobrosapp.data.CobrosDBHelper
 class CobrosAdapter(
     private var listaCobros: MutableList<CobroDTO>,
     private val onEdit: (CobroDTO) -> Unit,
+    private val onDelete: (CobroDTO) -> Unit,
     private val db: CobrosDBHelper
 ) : RecyclerView.Adapter<CobrosAdapter.CobroViewHolder>() {
 
@@ -45,7 +47,18 @@ class CobrosAdapter(
         holder.txtRecibido.text = "$${cobro.recibido}"
         holder.txtVuelto.text = "$" + String.format("%.2f", cobro.vuelto)
 
-        holder.btnEditar.setOnClickListener { onEdit(cobro) }
+        holder.btnEditar.setOnClickListener {
+            val popup = PopupMenu(holder.btnEditar.context, holder.btnEditar)
+            popup.menuInflater.inflate(R.menu.menu_opciones_cobro, popup.menu)
+            popup.setOnMenuItemClickListener{ item ->
+                when(item.itemId){
+                    R.id.menuEditar -> onEdit(cobro)
+                    R.id.menuEliminar -> onDelete(cobro)
+                }
+                true
+            }
+            popup.show()
+        }
 
         // animacion
         holder.itemView.apply {
