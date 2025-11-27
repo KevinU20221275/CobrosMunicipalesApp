@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,21 +36,16 @@ class HistorialCobrosActivity : AppCompatActivity() {
         txtTotal = findViewById(R.id.txtTotalValue)
         btnAgregar = findViewById(R.id.btnAgregarCobro)
 
-        // limpia las listas al iniciar
-        listaOriginal.clear()
-        listaFiltrada.clear()
-
-        // carga los pagos desde la db
-        listaOriginal.addAll(db.obtenerCobrosConInfo())
-
-        // copia la lista original a la lista que usaremos para filtrar
-        listaFiltrada.addAll(listaOriginal)
+        cargarCobros()
 
         adapter = CobrosAdapter(listaFiltrada,
             onEdit = { cobro ->
                 val intent = Intent(this, FormularioCobroActivity::class.java)
                 intent.putExtra("ID_COBRO", cobro.idCobro)
                 startActivity(intent)
+            },
+            onDelete = { cobro ->
+                confirmarEliminacion(cobro.idCobro)
             }
             ,db,)
         recyclerPagos.layoutManager = LinearLayoutManager(this)
@@ -69,6 +66,19 @@ class HistorialCobrosActivity : AppCompatActivity() {
         listaOriginal.addAll(db.obtenerCobrosConInfo())
 
         adapter.actualizarLista(listaOriginal)
+        calcularTotal()
+    }
+
+    private fun cargarCobros(){
+        // limpia las listas al iniciar
+        listaOriginal.clear()
+        listaFiltrada.clear()
+
+        // carga los pagos desde la db
+        listaOriginal.addAll(db.obtenerCobrosConInfo())
+
+        // copia la lista original a la lista que usaremos para filtrar
+        listaFiltrada.addAll(listaOriginal)
     }
 
     /* private fun configurarBusqueda() {
@@ -98,4 +108,21 @@ class HistorialCobrosActivity : AppCompatActivity() {
         val total = listaFiltrada.sumOf { it.monto }
         txtTotal.text = "$%.2f".format(total)
     }
+
+    private fun confirmarEliminacion(idCobro: Int) {
+        AlertDialog.Builder(this)
+            .setTitle("Confirmar eliminación")
+            .setMessage("¿Deseas eliminar este cobro? Esta acción no se puede deshacer.")
+            .setPositiveButton("Eliminar") { _, _ ->
+                db.eliminarCobro(idCobro)
+
+                // actualiza la lista despues de eliminar
+                onResume()
+
+                Toast.makeText(this, "Cobro eliminado", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
 }

@@ -435,6 +435,14 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         return lista
     }
 
+    // Eliminar
+    fun eliminarCobro(id:Int):Boolean {
+        val db = writableDatabase
+        val resultado = db.delete("cobro", "id_cobro = ?", arrayOf(id.toString()))
+        db.close()
+        return resultado > 0
+    }
+
     private fun Cursor.getStringOrNull(index: Int): String? {
         return if (isNull(index)) null else getString(index)
     }
