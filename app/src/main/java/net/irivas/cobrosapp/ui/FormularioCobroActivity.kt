@@ -30,6 +30,8 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import net.irivas.cobrosapp.data.Comerciante
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
 class FormularioCobroActivity : AppCompatActivity() {
@@ -301,7 +303,14 @@ class FormularioCobroActivity : AppCompatActivity() {
         val monto = inputMonto.text.toString().toDouble()
         val recibido = inputRecibido.text.toString().toDouble()
         val vuelto = recibido - monto
-        val fecha = inputFecha.text.toString().trim()
+        val fechaUsuario = inputFecha.text.toString().trim()
+        val fecha = try {
+            val formatterEntrada = DateTimeFormatter.ofPattern("d/M/yyyy")
+            val fechaLocal = LocalDate.parse(fechaUsuario, formatterEntrada)
+            fechaLocal.toString() // convierte a yyyy-MM-dd
+        } catch (e: Exception) {
+            LocalDate.now().toString()
+        }
         val lat = txtLatitud.text.toString().replace("Latitud: ", "").toDouble()
         val lon = txtLongitud.text.toString().replace("Longitud: ", "").toDouble()
         Log.d("comerciante: ", idComercianteSeleccionado.toString())
