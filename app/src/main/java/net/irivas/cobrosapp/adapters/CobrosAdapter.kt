@@ -4,14 +4,14 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import net.irivas.cobrosapp.R
 import net.irivas.cobrosapp.data.CobroDTO
 import net.irivas.cobrosapp.data.CobrosDBHelper
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class CobrosAdapter(
     private var listaCobros: MutableList<CobroDTO>,
@@ -42,8 +42,10 @@ class CobrosAdapter(
 
         holder.txtNombre.text = cobro.nombreComerciante
         holder.txtPuesto.text = "# ${cobro.numeroPuesto}"
-        holder.txtFecha.text = cobro.fecha
-        holder.txtCobrado.text = "$${cobro.monto}"
+        val fechaLocal = LocalDate.parse(cobro.fecha)  // yyyy-MM-dd
+        val fechaFormatoNormal = fechaLocal.format(DateTimeFormatter.ofPattern("d/M/yyyy"))
+        holder.txtFecha.text = fechaFormatoNormal
+        holder.txtCobrado.text = "$" + String.format("%.2f", cobro.monto)
         holder.txtRecibido.text = "$${cobro.recibido}"
         holder.txtVuelto.text = "$" + String.format("%.2f", cobro.vuelto)
 

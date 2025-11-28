@@ -7,6 +7,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -14,6 +15,9 @@ import net.irivas.cobrosapp.R
 import net.irivas.cobrosapp.adapters.CobrosAdapter
 import net.irivas.cobrosapp.data.CobroDTO
 import net.irivas.cobrosapp.data.CobrosDBHelper
+import java.time.LocalDate
+
+// este comentario sera mi commit antes del refactor :)
 
 class HistorialCobrosActivity : AppCompatActivity() {
     private lateinit var recyclerPagos: RecyclerView
@@ -23,8 +27,16 @@ class HistorialCobrosActivity : AppCompatActivity() {
     private lateinit var db: CobrosDBHelper
     private lateinit var btnAgregar: FloatingActionButton
 
+    private lateinit var chipHoy : TextView
+    private lateinit var chipAyer : TextView
+    private lateinit var chipSemana : TextView
+
     private val listaOriginal = mutableListOf<CobroDTO>()
     private val listaFiltrada = mutableListOf<CobroDTO>()
+
+    private enum class Filter { TODOS, HOY, AYER, SEMANA }
+    private var filtroActual = Filter.HOY
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,10 +47,12 @@ class HistorialCobrosActivity : AppCompatActivity() {
         inputSearch = findViewById(R.id.inputSearch)
         txtTotal = findViewById(R.id.txtTotalValue)
         btnAgregar = findViewById(R.id.btnAgregarCobro)
+        chipHoy = findViewById(R.id.chipHoy)
+        chipAyer = findViewById(R.id.chipAyer)
+        chipSemana = findViewById(R.id.chipSemana)
 
-        cargarCobros()
-
-        adapter = CobrosAdapter(listaFiltrada,
+        adapter = CobrosAdapter(
+            mutableListOf(),
             onEdit = { cobro ->
                 val intent = Intent(this, FormularioCobroActivity::class.java)
                 intent.putExtra("ID_COBRO", cobro.idCobro)
@@ -46,30 +60,56 @@ class HistorialCobrosActivity : AppCompatActivity() {
             },
             onDelete = { cobro ->
                 confirmarEliminacion(cobro.idCobro)
-            }
-            ,db,)
+            },
+            db,
+        )
         recyclerPagos.layoutManager = LinearLayoutManager(this)
         recyclerPagos.adapter = adapter
 
-        calcularTotal()
 
         btnAgregar.setOnClickListener {
             startActivity(Intent(this, FormularioCobroActivity::class.java))
         }
 
-        //configurarBusqueda()
+        cargarCobros()
+
+        // Por defecto
+        activarChip(chipHoy, chipAyer, chipSemana)
+        filtrarHoy()
+
+        chipHoy.setOnClickListener {
+            filtroActual = Filter.HOY
+            activarChip(chipHoy, chipAyer, chipSemana)
+            filtrarHoy()
+        }
+
+        chipAyer.setOnClickListener {
+            filtroActual = Filter.AYER
+            activarChip(chipAyer, chipHoy, chipSemana)
+            filtrarAyer()
+        }
+
+        chipSemana.setOnClickListener {
+            filtroActual = Filter.SEMANA
+            activarChip(chipSemana, chipHoy, chipAyer)
+            filtrarSemana()
+        }
+
+        calcularTotal()
+
     }
 
     override fun onResume() {
         super.onResume()
-        listaOriginal.clear()
-        listaOriginal.addAll(db.obtenerCobrosConInfo())
-
-        adapter.actualizarLista(listaOriginal)
-        calcularTotal()
+        when (filtroActual) {
+            Filter.HOY -> filtrarHoy()
+            Filter.AYER -> filtrarAyer()
+            Filter.SEMANA -> filtrarSemana()
+            else -> {}
+        }
     }
 
-    private fun cargarCobros(){
+    private fun cargarCobros() {
         // limpia las listas al iniciar
         listaOriginal.clear()
         listaFiltrada.clear()
@@ -81,28 +121,37 @@ class HistorialCobrosActivity : AppCompatActivity() {
         listaFiltrada.addAll(listaOriginal)
     }
 
-    /* private fun configurarBusqueda() {
-        inputSearch.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
+    private fun filtrarHoy() {
+        val hoy = LocalDate.now().toString()
+        val datos = db.obtenerCobrosConInfoPorFecha(hoy)
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        listaFiltrada.clear()
+        listaFiltrada.addAll(datos)
+        adapter.actualizarLista(listaFiltrada)
+        calcularTotal()
+    }
 
-            override fun onTextChanged(texto: CharSequence?, start: Int, before: Int, count: Int) {
+    private fun filtrarAyer() {
+        val ayer = LocalDate.now().minusDays(1).toString()
+        aplicarFiltro { db.obtenerCobrosConInfoPorFecha(ayer) }
+    }
 
-                val query = texto.toString().lowercase()
+    private fun filtrarSemana() {
+        val inicio = LocalDate.now().minusDays(6).toString()
+        val fin = LocalDate.now().toString()
+        aplicarFiltro { db.obtenerCobrosConInfoPorFecha(inicio, fin) }
+    }
 
-                val nuevaLista = listaOriginal.filter {
-                    it.nombre.lowercase().contains(query) ||
-                            it.numeroPuesto.lowercase().contains(query)
-                }
-                listaFiltrada.clear()
-                listaFiltrada.addAll(nuevaLista)
-                adapter.notifyDataSetChanged()
+    private fun aplicarFiltro(obtenerDatos: () -> List<CobroDTO>) {
+        val nuevaLista = obtenerDatos()
 
-                calcularTotal()
-            }
-        })
-    }*/
+        listaFiltrada.clear()
+        listaFiltrada.addAll(nuevaLista)
+
+        adapter.actualizarLista(listaFiltrada)
+        calcularTotal()
+    }
+
 
     private fun calcularTotal() {
         val total = listaFiltrada.sumOf { it.monto }
@@ -117,7 +166,13 @@ class HistorialCobrosActivity : AppCompatActivity() {
                 db.eliminarCobro(idCobro)
 
                 // actualiza la lista despues de eliminar
-                onResume()
+                when (filtroActual) {
+                    Filter.HOY -> filtrarHoy()
+                    Filter.AYER -> filtrarAyer()
+                    Filter.SEMANA -> filtrarSemana()
+                    else -> cargarCobros()
+                }
+
 
                 Toast.makeText(this, "Cobro eliminado", Toast.LENGTH_SHORT).show()
             }
@@ -125,4 +180,16 @@ class HistorialCobrosActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun activarChip(chipActivo: TextView, vararg chipsInactivos: TextView) {
+        chipActivo.animate().scaleX(0.95f).scaleY(0.95f).setDuration(60).withEndAction {
+            chipActivo.animate().scaleX(1f).scaleY(1f).duration = 60
+        }
+        chipActivo.setBackgroundResource(R.drawable.chip_active)
+        chipActivo.setTextColor(ContextCompat.getColor(this, R.color.primary))
+
+        chipsInactivos.forEach { chip ->
+            chip.setBackgroundResource(R.drawable.chip_inactive)
+            chip.setTextColor(ContextCompat.getColor(this, R.color.text_primary))
+        }
+    }
 }
