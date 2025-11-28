@@ -334,6 +334,75 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         return lista
     }
 
+    fun obtenerCobrosConInfoPorFecha(fecha: String): List<CobroDTO> {
+        val lista = mutableListOf<CobroDTO>()
+        val db = readableDatabase
+
+        val cursor = db.rawQuery("""
+        SELECT c.id_cobro, com.nombre, p.numero, c.monto, c.recibido, c.vuelto, c.fecha
+        FROM cobro c
+        INNER JOIN comerciante com ON c.id_comerciante = com.id_comerciante
+        INNER JOIN puesto p ON c.id_puesto = p.id_puesto
+        WHERE c.fecha = ?
+        ORDER BY c.id_cobro DESC
+    """.trimIndent(), arrayOf(fecha))
+
+        if (cursor.moveToFirst()) {
+            do {
+                lista.add(
+                    CobroDTO(
+                        cursor.getInt(0),
+                        cursor.getStringOrNull(1),
+                        cursor.getStringOrNull(2),
+                        cursor.getDouble(3),
+                        cursor.getDouble(4),
+                        cursor.getDouble(5),
+                        cursor.getString(6)
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        return lista
+    }
+
+    fun obtenerCobrosConInfoPorFecha(inicio: String, fin: String): List<CobroDTO> {
+        val lista = mutableListOf<CobroDTO>()
+        val db = readableDatabase
+
+        val cursor = db.rawQuery("""
+        SELECT c.id_cobro, com.nombre, p.numero, c.monto, c.recibido, c.vuelto, c.fecha
+        FROM cobro c
+        INNER JOIN comerciante com ON c.id_comerciante = com.id_comerciante
+        INNER JOIN puesto p ON c.id_puesto = p.id_puesto
+        WHERE c.fecha BETWEEN ? AND ?
+        ORDER BY c.id_cobro DESC
+    """.trimIndent(), arrayOf(inicio, fin))
+
+        if (cursor.moveToFirst()) {
+            do {
+                lista.add(
+                    CobroDTO(
+                        cursor.getInt(0),
+                        cursor.getStringOrNull(1),
+                        cursor.getStringOrNull(2),
+                        cursor.getDouble(3),
+                        cursor.getDouble(4),
+                        cursor.getDouble(5),
+                        cursor.getString(6)
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        return lista
+    }
+
+
     fun obtenerCobroParaEditar(idCobro: Int): CobroEditarDTO? {
         val db = readableDatabase
 
