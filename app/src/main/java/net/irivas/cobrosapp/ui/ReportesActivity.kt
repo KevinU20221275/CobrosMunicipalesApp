@@ -1,7 +1,17 @@
 package net.irivas.cobrosapp.ui
 
 import android.app.DatePickerDialog
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
 import android.os.Bundle
+import android.os.Environment
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
@@ -12,12 +22,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import net.irivas.cobrosapp.R
 import net.irivas.cobrosapp.adapters.ResumenAdapter
 import net.irivas.cobrosapp.adapters.TopComerciantesAdapter
@@ -29,9 +41,14 @@ import net.irivas.cobrosapp.data.CobrosDBHelper
 import net.irivas.cobrosapp.data.Metricas
 import net.irivas.cobrosapp.data.ReporteStats
 import net.irivas.cobrosapp.data.TopComerciante
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import kotlin.collections.take
 
 class ReportesActivity : AppCompatActivity() {
@@ -74,9 +91,17 @@ class ReportesActivity : AppCompatActivity() {
     private lateinit var adapterResumen : ResumenAdapter
     private lateinit var adapterTopPuestos: TopPuestoAdapter
     private lateinit var adapterTopComerciantes : TopComerciantesAdapter
+
+
     private val listaPuestos = mutableListOf<CobroPorPuesto>()
     private val listaComerciantes = mutableListOf<TopComerciante>()
     private val listaResumen = mutableListOf<CobroResumen>()
+
+    private lateinit var fabExportarPdf: FloatingActionButton
+    // variables para el pdf
+    private lateinit var stats: ReporteStats
+    private lateinit var metricas: Metricas
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,6 +122,9 @@ class ReportesActivity : AppCompatActivity() {
         cardTablaResumen = findViewById(R.id.cardTablaResumen)
         cardTopComerciantes =findViewById(R.id.cardTopComerciantes)
         cardCobrosPorPuesto = findViewById(R.id.cardCobrosPorPuesto)
+
+        // boton para exportar pdf
+        fabExportarPdf = findViewById(R.id.fabExportarPdf)
 
         // seccion de metricas/stats
         txtStatsTitle = findViewById(R.id.txtTituloResumen)
@@ -179,7 +207,7 @@ class ReportesActivity : AppCompatActivity() {
             showOrHideCards(true)
 
             val periodoTexto = "$fechaInicio al $fechaFin"
-            val stats = generarReporteStats(lista, periodoTexto)
+            stats = generarReporteStats(lista, periodoTexto)
 
             // stats
             txtStatsTitle.text = "Reporte del ${periodoTexto}"
@@ -192,7 +220,7 @@ class ReportesActivity : AppCompatActivity() {
             txtTotalPeriodo.text = "$${"%.2f".format(stats.totalCobrado)}"
 
             // metricas
-            val metricas = generarMetricas(lista)
+            metricas = generarMetricas(lista)
             txtDiaMayor.text = "Día de mayor recaudación: ${metricas.diaMayor} ($${"%.2f".format(metricas.montoMayor)})"
             txtDiaMenor.text = "Día de menor recaudación: ${metricas.diaMenor} ($${"%.2f".format(metricas.montoMenor)})"
             txtComercianteTop.text = "Comerciante que más pagó: ${metricas.comercianteTop} ($${"%.2f".format(metricas.montoTop)})"
@@ -212,6 +240,27 @@ class ReportesActivity : AppCompatActivity() {
             listaPuestos.addAll(generarCobrosPorPuesto(lista, 5))
             adapterTopPuestos.notifyDataSetChanged()
 
+        }
+
+        fabExportarPdf.setOnClickListener {
+            if (listaResumen.isEmpty() || listaComerciantes.isEmpty() || listaPuestos.isEmpty()) {
+                Toast.makeText(this, "Primero genere el reporte", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val fechaInicio = inputFechaInicio.text.toString().trim()
+            val fechaFin = inputFechaFin.text.toString().trim()
+
+            // genera el pdf
+            exportarPdf(
+                listaResumen,
+                listaComerciantes,
+                listaPuestos,
+                stats,
+                metricas,
+                fechaInicio,
+                fechaFin
+            )
         }
     }
 
@@ -354,6 +403,9 @@ class ReportesActivity : AppCompatActivity() {
 
         if (show) {
 
+            // el boton de pdf aparece
+            fabExportarPdf.show()
+
             var delay = 0L
             val delayStep = 120L  // delay
 
@@ -378,6 +430,7 @@ class ReportesActivity : AppCompatActivity() {
             animateCardOut(cardTopComerciantes)
             animateCardOut(cardCobrosPorPuesto)
             animateCardOut(cardResumenAnalisisMetricas)
+            fabExportarPdf.hide()
         }
     }
 
@@ -418,15 +471,170 @@ class ReportesActivity : AppCompatActivity() {
             .start()
     }
 
+    fun exportarPdf(
+        listaResumen: List<CobroResumen>,
+        listaComerciantes: List<TopComerciante>,
+        listaPuestos: List<CobroPorPuesto>,
+        stats: ReporteStats,
+        metricas: Metricas,
+        fechaInicio: String,
+        fechaFin: String
+    ) {
+        val pdf = PdfDocument()
+        val pageWidth = 595
+        val pageHeight = 842
+        var pageNumber = 1
 
-    // funcion para agregar las animaciones
-    private fun setCardVisibleAnimated(view: View, visible: Boolean) {
-        if (visible) {
-            if (view.visibility != View.VISIBLE) animateCardIn(view)
-        } else {
-            if (view.visibility == View.VISIBLE) animateCardOut(view)
+        val paintTitle = Paint().apply {
+            color = Color.BLACK
+            textSize = 26f
+            typeface = Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD)
         }
+        val paintSubTitle = Paint().apply {
+            color = Color.DKGRAY
+            textSize = 18f
+        }
+        val paintText = Paint().apply {
+            color = Color.BLACK
+            textSize = 14f
+        }
+        val linePaint = Paint().apply {
+            color = Color.LTGRAY
+            strokeWidth = 1f
+        }
+
+        val rowHeight = 25f
+
+        fun drawTable(
+            canvas: Canvas,
+            startX: Float,
+            startY: Float,
+            headers: List<String>,
+            rows: List<List<String>>,
+            columnWidths: List<Float>
+        ): Float {
+            var y = startY
+            var x = startX
+            val headerPaint = Paint(paintText).apply { typeface = Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD) }
+
+            // Dibujar encabezados
+            headers.forEachIndexed { i, header ->
+                canvas.drawText(header, x + 4f, y + rowHeight - 6f, headerPaint)
+                x += columnWidths[i]
+            }
+            y += rowHeight
+            canvas.drawLine(startX, y, startX + columnWidths.sum(), y, linePaint)
+
+            // Dibujar filas
+            rows.forEachIndexed { rowIndex, row ->
+                x = startX
+                // Fondo alternado
+                if (rowIndex % 2 == 0) {
+                    val bgPaint = Paint().apply { color = Color.parseColor("#F5F5F5") }
+                    canvas.drawRect(startX, y, startX + columnWidths.sum(), y + rowHeight, bgPaint)
+                }
+                row.forEachIndexed { i, cell ->
+                    val align = if (i == row.size - 1) Paint.Align.RIGHT else Paint.Align.LEFT
+                    val cellPaint = Paint(paintText).apply { textAlign = align }
+                    val drawX = if (align == Paint.Align.RIGHT) x + columnWidths[i] - 4f else x + 4f
+                    canvas.drawText(cell, drawX, y + rowHeight - 6f, cellPaint)
+                    x += columnWidths[i]
+                }
+                y += rowHeight
+                canvas.drawLine(startX, y, startX + columnWidths.sum(), y, linePaint)
+            }
+            return y
+        }
+
+        // --- PRIMERA PÁGINA ---
+        var pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber++).create()
+        var page = pdf.startPage(pageInfo)
+        var canvas = page.canvas
+        var y = 50f
+
+        canvas.drawText("Reporte de Cobros", 40f, y, paintTitle)
+        y += 30f
+        canvas.drawText("Periodo: $fechaInicio - $fechaFin", 40f, y, paintSubTitle)
+        y += 40f
+
+        // Estadísticas
+        val statsList = listOf(
+            "Total cobrado: $${"%.2f".format(stats.totalCobrado)}",
+            "Total recibido: $${"%.2f".format(stats.totalRecibido)}",
+            "Total vuelto: $${"%.2f".format(stats.totalVuelto)}",
+            "Cobros realizados: ${stats.numeroCobros}",
+            "Promedio por cobro: $${"%.2f".format(stats.PromedioPorCobro)}"
+        )
+
+
+        canvas.drawText("Resumen", 40f, y, paintTitle)
+        y += 30f
+        statsList.forEach {
+            canvas.drawText(it, 40f, y, paintText)
+            y += 20f
+        }
+
+        y += 20f
+        // Métricas
+        canvas.drawText("Métricas", 40f, y, paintTitle)
+        y += 30f
+        val metricasList = listOf(
+            "Día de mayor recaudación: ${metricas.diaMayor} ($${"%.2f".format(metricas.montoMayor)})",
+            "Día de menor recaudación: ${metricas.diaMenor} ($${"%.2f".format(metricas.montoMenor)})",
+            "Comerciante que más pagó: ${metricas.comercianteTop} ($${"%.2f".format(metricas.montoTop)})"
+        )
+        metricasList.forEach {
+            canvas.drawText(it, 40f, y, paintText)
+            y += 20f
+        }
+
+        y+= 30f
+        // Tabla Resumen
+        canvas.drawText("Resumen de Cobros", 40f, y, paintTitle)
+        y += 20f
+        val resumenRows = listaResumen.map { listOf(it.fecha, it.comerciante, it.puesto, "$${"%.2f".format(it.monto)}") }
+        val resumenColumns = listOf(120f, 150f, 100f, 100f)
+        drawTable(canvas, 40f, y, listOf("Fecha", "Comerciante", "# Puesto", "Monto"), resumenRows, resumenColumns)
+
+        pdf.finishPage(page)
+
+        // --- SEGUNDA PÁGINA: TOP COMERCIANTES + COBROS POR PUESTO ---
+        pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber++).create()
+        page = pdf.startPage(pageInfo)
+        canvas = page.canvas
+        y = 50f
+
+        // Top Comerciantes
+        canvas.drawText("Top Comerciantes", 40f, y, paintTitle)
+        y += 20f
+        val topRows = listaComerciantes.map { listOf(it.nombre, it.totalCobros.toString(), "$${"%.2f".format(it.totalPagado)}") }
+        val topColumns = listOf(200f, 100f, 100f)
+        y = drawTable(canvas, 40f, y, listOf("Nombre", "Total Cobros", "Total Pagado"), topRows, topColumns)
+
+        y += 50f
+        // Cobros por Puesto
+        canvas.drawText("Cobros por Puesto", 40f, y, paintTitle)
+        y += 20f
+        val puestosRows = listaPuestos.map { listOf(it.numeroPuesto, it.totalCobros.toString(), "$${"%.2f".format(it.totalMonto)}") }
+        val puestosColumns = listOf(150f, 100f, 100f)
+        drawTable(canvas, 40f, y, listOf("# Puesto", "Total Cobros", "Total Monto"), puestosRows, puestosColumns)
+
+        pdf.finishPage(page)
+
+        // --- GUARDAR PDF ---
+        val folder = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "ReportesCobros")
+        if (!folder.exists()) folder.mkdirs()
+
+        val file = File(folder, "ReporteCobros_${System.currentTimeMillis()}.pdf")
+        pdf.writeTo(FileOutputStream(file))
+        pdf.close()
+
+        Toast.makeText(this, "PDF generado correctamente", Toast.LENGTH_LONG).show()
+        val uri = FileProvider.getUriForFile(this, "${packageName}.provider", file)
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/pdf")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(intent)
     }
-
-
 }
