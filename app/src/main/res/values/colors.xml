@@ -7,4 +7,5 @@
     <color name="text_secondary">#757575</color>
     <color name="green_primary">#4CAF50</color>
     <color name="orange_button">#f3a200</color>
+    <color name="pdf_button">#f00000</color>
 </resources>
