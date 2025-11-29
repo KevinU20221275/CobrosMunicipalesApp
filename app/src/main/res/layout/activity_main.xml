@@ -18,15 +18,15 @@
         android:id="@+id/btnRegistrarPuesto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Registrar Puesto"
+        android:text="Ver Puestos"
         android:padding="16dp"
         android:layout_marginBottom="16dp"/>
 
     <Button
-        android:id="@+id/btnRegistrarCobro"
+        android:id="@+id/btnGenerarReporte"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Registrar Cobro"
+        android:text="Generar Reporte"
         android:padding="16dp"
         android:layout_marginBottom="16dp"/>
 

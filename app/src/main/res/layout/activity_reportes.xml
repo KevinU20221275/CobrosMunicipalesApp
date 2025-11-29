@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="16dp" android:background="?android:colorBackground">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="4dp">
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/txtTitulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reportes de Cobros"
+            android:textColor="@color/primary"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <!-- Subtítulo -->
+        <TextView
+            android:id="@+id/txtSubtitulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Selecciona un rango de fechas para generar el reporte"
+            android:layout_marginTop="8dp"
+            android:textSize="14sp"
+            android:textColor="?android:textColorSecondary" />
+
+        <!-- CARD FECHA INICIO -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardFechaInicio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
+            <RelativeLayout
+                android:padding="16dp"
+                android:background="@drawable/card_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/labelFechaInicio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha inicio"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="?android:textColorPrimary" />
+
+                <TextView
+                    android:id="@+id/inputFechaInicio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DD/MM/AAAA"
+                    android:textColor="?android:textColorSecondary"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="32dp" />
+
+                <ImageView
+                    android:id="@+id/iconFechaInicio"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_calendar"
+                    android:tint="@color/primary"
+                    android:layout_centerVertical="true" />
+
+            </RelativeLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- CARD FECHA FINAL -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardFechaFinal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
+            <RelativeLayout
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:background="@drawable/card_background"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/labelFechaFinal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha final"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="?android:textColorPrimary" />
+
+                <TextView
+                    android:id="@+id/inputFechaFinal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DD/MM/AAAA"
+                    android:textColor="?android:textColorSecondary"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="32dp" />
+
+                <ImageView
+                    android:id="@+id/iconFechaFinal"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_calendar"
+                    android:tint="@color/primary"
+                    android:layout_centerVertical="true" />
+
+            </RelativeLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- BOTÓN GENERAR -->
+        <Button
+            android:id="@+id/btnGenerarReporte"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="20dp"
+            android:text="Generar Reporte"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="@color/primary" />
+
+        <!-- CARD: TOTAL -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:visibility="gone"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_background"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Recaudado"
+                    android:textColor="@color/primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtTotalRecaudado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$0.00"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:paddingTop="5dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- STATS/RESUMEN -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardResumenAnalisisMetricas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_background"
+                android:padding="16dp">
+
+                <!-- TÍTULO -->
+                <TextView
+                    android:id="@+id/txtTituloResumen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Resumen del período"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:paddingBottom="12dp"/>
+
+                <!-- SECCIÓN: ESTADÍSTICAS -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estadísticas"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/txtStatsTotalCobrado"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Total cobrado: $0.00"
+                        android:drawableStart="@drawable/ic_total_cobrado"
+                        android:drawablePadding="8dp"
+                        android:paddingVertical="4dp"/>
+
+                    <TextView
+                        android:id="@+id/txtStatsTotalRecibido"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Total recibido: $0.00"
+                        android:drawableStart="@drawable/ic_total_recibido"
+                        android:drawablePadding="8dp"
+                        android:paddingVertical="4dp"/>
+
+                    <TextView
+                        android:id="@+id/txtStatsTotalVuelto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Total vuelto: $0.00"
+                        android:drawableStart="@drawable/ic_total_vuelto"
+                        android:drawablePadding="8dp"
+                        android:paddingVertical="4dp"/>
+
+                    <TextView
+                        android:id="@+id/txtStatsNumeroCobros"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Cobros realizados: 0"
+                        android:drawableStart="@drawable/ic_cobros_realizados"
+                        android:drawablePadding="8dp"
+                        android:paddingVertical="4dp"/>
+
+                    <TextView
+                        android:id="@+id/txtStatsPromedioCobro"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Promedio por cobro: $0.00"
+                        android:drawableStart="@drawable/ic_promedio_cobro"
+                        android:drawablePadding="8dp"
+                        android:paddingVertical="4dp"/>
+                </LinearLayout>
+
+                <!-- DIVISOR -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#DDDDDD"
+                    android:layout_marginVertical="14dp"/>
+
+                <!-- SECCIÓN: MÉTRICAS -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Métricas"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/txtDiaMayor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Día de mayor recaudación: -"
+                        android:drawableStart="@drawable/ic_dia_mayor"
+                        android:drawablePadding="8dp"
+                        android:paddingVertical="4dp"/>
+
+                    <TextView
+                        android:id="@+id/txtDiaMenor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Día de menor recaudación: -"
+                        android:drawableStart="@drawable/ic_dia_menor"
+                        android:drawablePadding="8dp"
+                        android:paddingVertical="4dp"/>
+
+                    <TextView
+                        android:id="@+id/txtComercianteTop"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Comerciante que más pagó: -"
+                        android:drawableStart="@drawable/ic_comerciante_mas_pago"
+                        android:drawablePadding="8dp"
+                        android:paddingVertical="4dp"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- CARD: COBROS POR PUESTO -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardCobrosPorPuesto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_background"
+            android:layout_marginTop="20dp"
+            android:padding="0dp"
+            android:visibility="gone"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:padding="20dp"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/txtTituloPuestos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cobros por Puesto"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary"
+                    android:textSize="18sp"
+                    android:paddingBottom="10dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerPuestos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- CARD: TOP 5 COMERCIANTES -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardTopComerciantes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/card_background"
+            android:visibility="gone"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:padding="20dp"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/txtTituloTopComerciantes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Top Comerciantes"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:paddingBottom="10dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerTopComerciantes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- CARD: TABLA RESUMEN -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardTablaResumen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:visibility="gone"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            android:background="@drawable/card_background">
+
+            <LinearLayout
+                android:padding="20dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_background">
+
+                <!-- TÍTULO -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tabla Resumen de Cobros"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:paddingBottom="10dp" />
+
+                <!-- ENCABEZADOS -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp"
+                    android:paddingHorizontal="8dp"
+                    android:background="#F5F5F5"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Fecha"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="Comerciante"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Puesto"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Monto"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <!-- RECYCLER VIEW -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerResumen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="6dp"/>
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- EMPTY STATE -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="5dp">
+
+            <LinearLayout
+                android:padding="24dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_receipt"
+                    android:background="@drawable/chip_active"
+                    android:tint="@color/primary" />
+
+                <TextView
+                    android:text="Sin Resultados"
+                    android:textSize="18sp"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:text="Genera un reporte para ver los detalles de los cobros aquí."
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:textColor="?android:textColorSecondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
