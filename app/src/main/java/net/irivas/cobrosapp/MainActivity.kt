@@ -8,6 +8,7 @@ import net.irivas.cobrosapp.ui.HistorialCobrosActivity
 import net.irivas.cobrosapp.ui.ListarComerciantesActivity
 import net.irivas.cobrosapp.ui.ListarPuestosActivity
 import net.irivas.cobrosapp.ui.FormularioCobroActivity
+import net.irivas.cobrosapp.ui.ReportesActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,8 +23,8 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, ListarPuestosActivity::class.java))
         }
 
-        findViewById<Button>(R.id.btnRegistrarCobro).setOnClickListener {
-            startActivity(Intent(this, FormularioCobroActivity::class.java))
+        findViewById<Button>(R.id.btnGenerarReporte).setOnClickListener {
+            startActivity(Intent(this, ReportesActivity::class.java))
         }
 
         findViewById<Button>(R.id.btnHistorial).setOnClickListener {
