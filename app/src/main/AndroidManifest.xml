@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CobrosApp">
         <activity
+            android:name=".ui.ReportesActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.ListarPuestosActivity"
             android:exported="false" />
         <activity
