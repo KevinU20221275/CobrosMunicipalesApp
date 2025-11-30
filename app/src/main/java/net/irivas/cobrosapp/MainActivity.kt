@@ -8,6 +8,7 @@ import net.irivas.cobrosapp.ui.HistorialCobrosActivity
 import net.irivas.cobrosapp.ui.ListarComerciantesActivity
 import net.irivas.cobrosapp.ui.ListarPuestosActivity
 import net.irivas.cobrosapp.ui.FormularioCobroActivity
+import net.irivas.cobrosapp.ui.PanelAdministracionActivity
 import net.irivas.cobrosapp.ui.ReportesActivity
 
 class MainActivity : AppCompatActivity() {
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnRegistrarPuesto).setOnClickListener {
-            startActivity(Intent(this, ListarPuestosActivity::class.java))
+            startActivity(Intent(this, PanelAdministracionActivity::class.java))
         }
 
         findViewById<Button>(R.id.btnGenerarReporte).setOnClickListener {
