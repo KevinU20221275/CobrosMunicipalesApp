@@ -65,6 +65,12 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
                 FOREIGN KEY (id_puesto) REFERENCES puesto(id_puesto)
             )
         """)
+
+        // Insertar usuario inicial (Rosa)
+        db.execSQL("""
+            INSERT INTO cobrador (nombre, usuario, contrasena)
+            VALUES ('Rosa Gómez', 'rosa', '1234')
+        """)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -510,6 +516,20 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         val resultado = db.delete("cobro", "id_cobro = ?", arrayOf(id.toString()))
         db.close()
         return resultado > 0
+    }
+
+    // funcion para validar el usuario
+    fun validarUsuario(usuario: String, contrasena: String): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT * FROM cobrador WHERE usuario = ? AND contrasena = ?",
+            arrayOf(usuario, contrasena)
+        )
+
+        val existe = cursor.count > 0
+        cursor.close()
+        db.close()
+        return existe
     }
 
     private fun Cursor.getStringOrNull(index: Int): String? {
