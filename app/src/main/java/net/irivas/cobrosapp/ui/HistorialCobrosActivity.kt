@@ -2,6 +2,8 @@ package net.irivas.cobrosapp.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -17,8 +19,6 @@ import net.irivas.cobrosapp.data.CobroDTO
 import net.irivas.cobrosapp.data.CobrosDBHelper
 import java.time.LocalDate
 
-// este comentario sera mi commit antes del refactor :)
-
 class HistorialCobrosActivity : AppCompatActivity() {
     private lateinit var recyclerPagos: RecyclerView
     private lateinit var adapter: CobrosAdapter
@@ -30,6 +30,7 @@ class HistorialCobrosActivity : AppCompatActivity() {
     private lateinit var chipHoy : TextView
     private lateinit var chipAyer : TextView
     private lateinit var chipSemana : TextView
+    private lateinit var chipTodos: TextView
 
     private val listaOriginal = mutableListOf<CobroDTO>()
     private val listaFiltrada = mutableListOf<CobroDTO>()
@@ -50,6 +51,7 @@ class HistorialCobrosActivity : AppCompatActivity() {
         chipHoy = findViewById(R.id.chipHoy)
         chipAyer = findViewById(R.id.chipAyer)
         chipSemana = findViewById(R.id.chipSemana)
+        chipTodos = findViewById(R.id.chipTodos)
 
         adapter = CobrosAdapter(
             mutableListOf(),
@@ -77,22 +79,30 @@ class HistorialCobrosActivity : AppCompatActivity() {
         activarChip(chipHoy, chipAyer, chipSemana)
         filtrarHoy()
 
+        configurarBuscador()
+
         chipHoy.setOnClickListener {
             filtroActual = Filter.HOY
-            activarChip(chipHoy, chipAyer, chipSemana)
+            activarChip(chipHoy, chipAyer, chipSemana, chipTodos)
             filtrarHoy()
         }
 
         chipAyer.setOnClickListener {
             filtroActual = Filter.AYER
-            activarChip(chipAyer, chipHoy, chipSemana)
+            activarChip(chipAyer, chipHoy, chipSemana, chipTodos)
             filtrarAyer()
         }
 
         chipSemana.setOnClickListener {
             filtroActual = Filter.SEMANA
-            activarChip(chipSemana, chipHoy, chipAyer)
+            activarChip(chipSemana, chipHoy, chipAyer, chipTodos)
             filtrarSemana()
+        }
+
+        chipTodos.setOnClickListener {
+            filtroActual = Filter.TODOS
+            activarChip(chipTodos, chipHoy, chipAyer, chipSemana)
+            getTodos()
         }
 
         calcularTotal()
@@ -142,6 +152,10 @@ class HistorialCobrosActivity : AppCompatActivity() {
         aplicarFiltro { db.obtenerCobrosConInfoPorFecha(inicio, fin) }
     }
 
+    private fun getTodos(){
+        aplicarFiltro { db.obtenerCobrosConInfo() }
+    }
+
     private fun aplicarFiltro(obtenerDatos: () -> List<CobroDTO>) {
         val nuevaLista = obtenerDatos()
 
@@ -178,6 +192,29 @@ class HistorialCobrosActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancelar", null)
             .show()
+    }
+
+    private fun configurarBuscador() {
+        inputSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val texto = s?.toString()?.trim() ?: ""
+                if (texto.isEmpty()) {
+                    // Restaurar lista completa
+                    adapter.actualizarLista(listaOriginal)
+                } else {
+                    val filtrado = listaOriginal.filter { c ->
+                        c.nombreComerciante!!.contains(
+                            texto,
+                            ignoreCase = true
+                        ) || c.numeroPuesto!!.contains(texto)
+                    }
+                    adapter.actualizarLista(filtrado)
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
     }
 
     private fun activarChip(chipActivo: TextView, vararg chipsInactivos: TextView) {
