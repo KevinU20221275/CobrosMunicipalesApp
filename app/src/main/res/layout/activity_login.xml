@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="20dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="290dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_login_user" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Inicio de Sesión"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary"
+            android:gravity="center"
+            android:layout_marginTop="25dp"/>
+
+        <TextView
+            android:id="@+id/txtSubtitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ingrese sus datos"
+            android:textSize="16sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
+            android:layout_marginTop="12dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/card_background"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="#F2F2F2"
+            android:clipToOutline="true">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:tint="@color/primary"
+                android:src="@drawable/ic_user" />
+
+            <EditText
+                android:id="@+id/txtUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nombre de usuario"
+                android:background="@android:color/transparent"
+                android:paddingLeft="10dp"/>
+        </LinearLayout>
+
+        <!-- Campo contraseña -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/card_background"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="10dp"
+            android:backgroundTint="#F2F2F2"
+            android:clipToOutline="true">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:tint="@color/primary"
+                android:src="@drawable/ic_password" />
+
+            <EditText
+                android:id="@+id/txtUserPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Contraseña"
+                android:inputType="textPassword"
+                android:background="@android:color/transparent"
+                android:paddingLeft="10dp"/>
+
+        </LinearLayout>
+        <!-- Botón Iniciar Sesión -->
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="30dp"
+            android:text="Iniciar Sesión"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:backgroundTint="@color/primary"
+            android:textColor="#FFFF"
+            android:textSize="20sp"
+            android:layout_marginBottom="18dp"
+            />
+
+    </LinearLayout>
+
+</ScrollView>
