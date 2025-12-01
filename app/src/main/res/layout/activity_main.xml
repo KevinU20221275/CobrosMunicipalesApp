@@ -1,40 +1,62 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center">
+    android:fillViewport="true">
 
-    <Button
-        android:id="@+id/btnListarComerciantes"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Listar Comerciantes"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp"/>
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="20dp">
 
-    <Button
-        android:id="@+id/btnRegistrarPuesto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ver Puestos"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp"/>
+        <ImageView
+            android:layout_width="387dp"
+            android:layout_height="329dp"
+            android:layout_marginTop="20dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/pantalla_inicio" />
 
-    <Button
-        android:id="@+id/btnGenerarReporte"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Generar Reporte"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¡Bienvenido/a! \n Cobros Municipales App"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary"
+            android:gravity="center"
+            android:layout_marginTop="25dp"/>
 
-    <Button
-        android:id="@+id/btnHistorial"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Historial de Cobros"
-        android:padding="16dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gestiona tus cobros de forma fácil\n y rápida en el mercado."
+            android:textSize="16sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
+            android:layout_marginTop="12dp"/>
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btnIngresar"
+            android:layout_width="250dp"
+            android:layout_height="55dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="@color/primary"
+            android:fontFamily="sans-serif-medium"
+            android:padding="10dp"
+            android:text="Ingresar"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/txtTerminos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="Tu Manera Más Sencilla de Realizar Los Cobros"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+    </LinearLayout>
+</ScrollView>
