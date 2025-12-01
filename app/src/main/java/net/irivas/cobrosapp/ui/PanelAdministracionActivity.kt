@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -52,7 +51,7 @@ class PanelAdministracionActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_logout -> {
-                //cerrarSesion()
+                cerrarSesion()
                 Log.d("LOGOUT", "Cerrando secion....")
                 true
             }
@@ -60,16 +59,16 @@ class PanelAdministracionActivity : AppCompatActivity() {
         }
     }
 
-   /* private fun cerrarSesion() {
+   private fun cerrarSesion() {
         // Limpiar datos guardados si usan SharedPreferences
-        getSharedPreferences("appPrefs", MODE_PRIVATE)
+        getSharedPreferences("sesion", MODE_PRIVATE)
             .edit()
             .clear()
             .apply()
 
-        // Mandar al login
+        // Mandar al login y limpiar la historial de activities
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-    } */
+   }
 }
