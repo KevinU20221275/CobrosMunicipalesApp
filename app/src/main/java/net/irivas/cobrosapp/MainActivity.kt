@@ -16,20 +16,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.btnListarComerciantes).setOnClickListener {
-            startActivity(Intent(this, ListarComerciantesActivity::class.java))
-        }
-
-        findViewById<Button>(R.id.btnRegistrarPuesto).setOnClickListener {
+        if (isLogin()){
             startActivity(Intent(this, PanelAdministracionActivity::class.java))
+            finish()
+            return
         }
 
-        findViewById<Button>(R.id.btnGenerarReporte).setOnClickListener {
-            startActivity(Intent(this, ReportesActivity::class.java))
+        findViewById<Button>(R.id.btnIngresar).setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
         }
+    }
 
-        findViewById<Button>(R.id.btnHistorial).setOnClickListener {
-            startActivity(Intent(this, HistorialCobrosActivity::class.java))
-        }
+    private fun isLogin(): Boolean {
+        val prefs = getSharedPreferences("sesion", MODE_PRIVATE)
+        return prefs.getBoolean("logueado", false)
     }
 }
