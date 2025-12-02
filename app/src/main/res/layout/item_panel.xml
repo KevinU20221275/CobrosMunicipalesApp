@@ -5,12 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:padding="16dp"
-    app:cardElevation="4dp"
+    app:cardElevation="0dp"
     app:cardCornerRadius="16dp"
+    android:background="@drawable/card_background"
     android:clickable="true"
-    android:foreground="?attr/selectableItemBackground"
-    android:backgroundTint="@color/background_light">
+    android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,9 +21,12 @@
         <!-- Ícono Material -->
         <ImageView
             android:id="@+id/imgIcon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/chip_active"
+            android:padding="8dp"
             android:tint="@color/primary"
+            android:layout_marginTop="10dp"
             android:src="@drawable/ic_store"/>
 
         <!-- Título -->
@@ -44,7 +46,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Administrar puestos"
-            android:textSize="14sp"
+            android:layout_marginBottom="10dp"
+            android:textSize="11sp"
             android:textColor="@color/text_secondary"/>
     </LinearLayout>
 
