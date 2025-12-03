@@ -222,7 +222,7 @@
                     android:layout_height="55dp"
                     android:background="@drawable/input_bg"
                     android:gravity="center_vertical"
-                    android:padding="14dp"
+                    android:padding="10dp"
                     android:orientation="horizontal">
 
                     <EditText
@@ -245,10 +245,10 @@
                     <ImageView
                         android:id="@+id/imgCalendar"
                         android:src="@drawable/ic_calendar"
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:tint="#6B7280"
-                        android:padding="4dp"/>
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:tint="@color/primary"
+                        android:padding="0dp"/>
                 </LinearLayout>
 
                 <!-- Ubicación -->
