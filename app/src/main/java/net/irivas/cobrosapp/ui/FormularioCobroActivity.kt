@@ -85,6 +85,17 @@ class FormularioCobroActivity : AppCompatActivity() {
             inputVuelto.setText(String.format("%.2f", vuelto))
         }
 
+        inputMonto.addTextChangedListener {
+            val recibido = inputRecibido.text.toString().toDoubleOrNull() ?: 0.0
+
+            if (recibido > 0){
+                val monto = inputMonto.text.toString().toDoubleOrNull() ?: 0.0
+                val vuelto = recibido - monto
+
+                inputVuelto.setText(String.format("%.2f", vuelto))
+            }
+        }
+
         inputFecha.setOnClickListener { mostrarCalendario() }
         imgCalendar.setOnClickListener { mostrarCalendario() }
 
