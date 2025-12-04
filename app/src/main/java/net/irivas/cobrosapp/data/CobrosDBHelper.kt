@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import androidx.core.database.sqlite.transaction
 
 
 class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", null, 1){
@@ -68,6 +69,8 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
             INSERT INTO cobrador (nombre, usuario, contrasena)
             VALUES ('Rosa Gómez', 'rosa', '1234')
         """)
+
+        insertarDatosIniciales(db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -77,6 +80,67 @@ class CobrosDBHelper(context: Context) : SQLiteOpenHelper(context, "cobros.dp", 
         db.execSQL("DROP TABLE IF EXISTS comerciante")
         db.execSQL("DROP TABLE IF EXISTS cobrador")
         onCreate(db)
+    }
+
+    // Insertar datos default para pruebas
+    private fun insertarDatosIniciales(db: SQLiteDatabase) {
+        db.transaction {
+
+            try {
+                execSQL(
+                    """INSERT INTO comerciante (nombre, telefono) VALUES
+                ('Juan Pérez', '7000-1111'),
+                ('María López', '7000-2222'),
+                ('Carlos Rivas', '7000-3333'),
+                ('Ana Torres', '7000-4444'),
+                ('Luis Hernández', '7000-5555')
+            """
+                )
+
+                execSQL(
+                    """INSERT INTO puesto (numero, tarifa, disponible) VALUES
+                (1, 1.00, 0),
+                (2, 1.00, 0),
+                (3, 1.25, 0),
+                (4, 1.25, 0),
+                (5, 1.50, 0)
+            """
+                )
+
+                execSQL(
+                    """INSERT INTO comerciante_puesto (id_comerciante, id_puesto) VALUES
+                (1, 1),
+                (2, 2),
+                (3, 3),
+                (4, 4),
+                (5, 5)
+            """
+                )
+
+                execSQL(
+                    """INSERT INTO cobro (id_cobrador, id_comerciante, id_puesto, monto, recibido, vuelto, fecha, latitud, longitud) VALUES
+                (1, 1, 1, 1.00, 2.00, 1.00, '2025-12-04', 13.4834, -88.1833),
+                (1, 2, 2, 1.00, 1.00, 0.00, '2025-12-04', 13.4834, -88.1833),
+                (1, 3, 3, 1.25, 2.00, 0.75, '2025-12-04', 13.4834, -88.1833),
+                (1, 4, 4, 1.25, 5.00, 3.75, '2025-12-05', 13.4834, -88.1833),
+                (1, 5, 5, 1.50, 2.00, 0.50, '2025-12-05', 13.4834, -88.1833),
+                (1, 1, 1, 1.00, 1.00, 0.00, '2025-12-06', 13.4834, -88.1833),
+                (1, 2, 2, 1.00, 5.00, 4.00, '2025-12-06', 13.4834, -88.1833),
+                (1, 3, 3, 1.25, 2.00, 0.75, '2025-12-06', 13.4834, -88.1833),
+                (1, 4, 4, 1.25, 2.00, 0.75, '2025-12-08', 13.4834, -88.1833),
+                (1, 5, 5, 1.50, 2.00, 0.50, '2025-12-08', 13.4834, -88.1833),
+                (1, 1, 1, 1.00, 1.00, 0.00, '2025-12-08', 13.4834, -88.1833),
+                (1, 2, 2, 1.00, 2.00, 1.00, '2025-12-08', 13.4834, -88.1833),
+                (1, 3, 3, 1.25, 5.00, 3.75, '2025-12-09', 13.4834, -88.1833),
+                (1, 4, 4, 1.25, 1.25, 0.00, '2025-12-09', 13.4834, -88.1833),
+                (1, 5, 5, 1.50, 5.00, 3.50, '2025-12-09', 13.4834, -88.1833),
+                (1, 1, 1, 1.00, 2.00, 1.00, '2025-12-09', 13.4834, -88.1833);
+            """
+                )
+
+            } finally {
+            }
+        }
     }
 
     // INSERTAR Y ACTUALIZAR
