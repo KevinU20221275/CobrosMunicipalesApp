@@ -41,7 +41,7 @@ class CobrosAdapter(
         val cobro = listaCobros[position]
 
         holder.txtNombre.text = cobro.nombreComerciante
-        holder.txtPuesto.text = "# ${cobro.numeroPuesto}"
+        holder.txtPuesto.text = "Puesto #${cobro.numeroPuesto}"
         val fechaLocal = LocalDate.parse(cobro.fecha)  // yyyy-MM-dd
         val fechaFormatoNormal = fechaLocal.format(DateTimeFormatter.ofPattern("d/M/yyyy"))
         holder.txtFecha.text = fechaFormatoNormal
